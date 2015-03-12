@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-public class HomeView extends Activity implements OnClickListener{
+public class HomeActivity extends Activity implements OnClickListener{
     
     
     @Override
