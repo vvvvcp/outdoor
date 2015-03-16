@@ -13,20 +13,35 @@ public class HomeView extends ImageView{
     public HomeView(Context context) {
         super(context);
         // TODO Auto-generated constructor stub
+        mDirection = 0.0f;
+        Home = null;
     }
     public HomeView(Context context, AttributeSet attrs){
         super(context,attrs);
-        
+        mDirection = 0.0f;
+        Home = null;
+                
     }
     public HomeView(Context context , AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
-        
+        mDirection = 0.0f;
+        Home = null;
     }
     
     
     @Override
     protected void onDraw(Canvas canvas){
-        
-        
+        if (Home == null){
+               Home = getDrawable();
+               Home.setBounds(0, 0, getWidth(), getHeight());
+        }
+        canvas.save();
+        canvas.rotate(mDirection, getWidth()/2, getHeight()/2);
+        Home.draw(canvas);
+        canvas.restore();
+    }
+    public void updateDirection(float direction){
+        mDirection = direction;
+        invalidate();
     }
 }
