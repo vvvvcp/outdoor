@@ -3,23 +3,25 @@ package com.goldsand.outdoor;
 import android.app.Application;
 import android.content.Context;
 import android.location.Criteria;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
-import android.widget.EditText;
+import android.util.Log;
 
 public class LocationApplication extends Application{
     private static LocationApplication instance;
     //public  LocationC
     private double latitude;
     private double longitude;
+    
+    private LocationManager mLocationManager;
+    
+    private String mLocationProvider;
 
 
-
-  //  LocationManager locationManager=(LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+  
     public static LocationApplication getInstance() {
 
         return instance;
@@ -32,23 +34,20 @@ public class LocationApplication extends Application{
 
 
     }
-    private LocationListener locationListener=new LocationListener() {
+    private LocationListener mlocationListener=new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            updateLoaction(location);
+             updateLocation(location);
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            switch (status){
-                case LocationProvider.AVAILABLE:
-                    break;
-                case LocationProvider.OUT_OF_SERVICE:
-                    break;
-                case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                    break;
-            }
-
+            if (status != LocationProvider.OUT_OF_SERVICE) {
+                updateLocation(mLocationManager
+                     .getLastKnownLocation(mLocationProvider));
+              } else {
+                Log.i("huxiao","cant location");
+              }
         }
 
         @Override
@@ -60,16 +59,15 @@ public class LocationApplication extends Application{
 
         @Override
         public void onProviderDisabled(String provider) {
-            updateLoaction(null);
+            updateLocation(null);
 
         }
     };
-    //private GpsStatus.Listener listener=new GpsStatus.Listener();
-
+    
     private void getLocation() {
-        LocationManager locationManager;
+        //LocationManager locationManager;
         String serviceName = Context.LOCATION_SERVICE;
-        locationManager = (LocationManager) this.getSystemService(serviceName);
+        mLocationManager = (LocationManager) this.getSystemService(serviceName);
 
         Criteria criteria=new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -78,19 +76,35 @@ public class LocationApplication extends Application{
         criteria.setCostAllowed(true);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
 
-        String provider=locationManager.getBestProvider(criteria,true);
-        Location location=locationManager.getLastKnownLocation(provider);
-        updateLoaction(location);
-        locationManager.requestLocationUpdates(provider,100*1000,500,locationListener);
+        mLocationProvider=mLocationManager.getBestProvider(criteria,true);
+        Log.i("huxiao","mLocationProvider "+mLocationProvider);
 
     }
-    private void updateLoaction(Location location) {
+    public void addLocation(){
+        if(mLocationProvider!=null) {
+           Location location=mLocationManager.getLastKnownLocation(mLocationProvider);
+           updateLocation(location);
+           mLocationManager.requestLocationUpdates(mLocationProvider,2000,10,mlocationListener);
+           Log.i("huxiao","requestLocationUpdates");
+           
+        }
+        
+    }
+    public void removeLocation(){
+        if (mLocationProvider != null) {
+           mLocationManager.removeUpdates(mlocationListener);
+        }
+        
+    }
+    private void updateLocation(Location location) {
         if(location != null) {
             latitude=location.getLatitude();
+            Log.i("huxiao", "huxiao add"+latitude);
             longitude=location.getLongitude();
         }
     }
     public double getLatitude(){
+        
         return latitude;
     }
     public double getLongitude(){
