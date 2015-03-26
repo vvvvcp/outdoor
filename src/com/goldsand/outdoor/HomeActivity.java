@@ -214,6 +214,7 @@ public class HomeActivity extends Activity implements OnClickListener{
     }
     private void updateLocation(){
         locationTextView.setText("latitude:"+Double.toString(outdoor.getLatitude())+"  "+"Longitude:"+Double.toString(outdoor.getLongitude()));
+        base_stationTextView.setText("Mcc:"+outdoor.getMcc()+"Mnc:"+outdoor.getMnc()+"Lac:"+outdoor.getLac()+"Cid:"+outdoor.getCid());
             
     }
     @Override

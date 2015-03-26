@@ -1,5 +1,6 @@
 package com.goldsand.outdoor;
 
+import android.R.integer;
 import android.app.Application;
 import android.content.Context;
 import android.location.Criteria;
@@ -8,6 +9,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
+import android.text.GetChars;
 import android.util.Log;
 
 public class LocationApplication extends Application{
@@ -19,7 +23,11 @@ public class LocationApplication extends Application{
     private LocationManager mLocationManager;
     
     private String mLocationProvider;
-
+    private TelephonyManager mTelephonyManager;
+    private int mcc;
+    private int mnc;
+    private int lac;
+    private int cid;
 
   
     public static LocationApplication getInstance() {
@@ -31,6 +39,7 @@ public class LocationApplication extends Application{
         instance=this;
         getLocation();
         super.onCreate();
+        initCellinfo();
 
 
     }
@@ -63,7 +72,15 @@ public class LocationApplication extends Application{
 
         }
     };
-    
+    private void initCellinfo() {
+        mTelephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        GsmCellLocation location = (GsmCellLocation) mTelephonyManager.getCellLocation();
+        String operator = mTelephonyManager.getNetworkOperator();
+        mcc = Integer.parseInt(operator.substring(0, 3));
+        mnc = Integer.parseInt(operator.substring(3));
+        lac = location.getLac();
+        cid = location.getCid();
+    }
     private void getLocation() {
         //LocationManager locationManager;
         String serviceName = Context.LOCATION_SERVICE;
@@ -109,6 +126,18 @@ public class LocationApplication extends Application{
     }
     public double getLongitude(){
         return longitude;
+    }
+    public int getMcc(){
+        return mcc;
+    }
+    public int getMnc(){
+        return mnc;
+    }
+    public int getLac(){
+        return lac;
+    }
+    public int getCid(){
+        return cid;
     }
 
 }
