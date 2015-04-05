@@ -35,6 +35,8 @@
                 <action android:name="android.intent.action.TIME_TICK"/>
             </intent-filter>   
         </receiver>
+        <service android:name="com.goldsand.outservice.outdoorService"
+            android:exported="false"/>
     </application>
 
 </manifest>

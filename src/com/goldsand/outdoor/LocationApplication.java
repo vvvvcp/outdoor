@@ -39,7 +39,7 @@ public class LocationApplication extends Application{
         instance=this;
         getLocation();
         super.onCreate();
-        initCellinfo();
+        //initCellinfo();
 
 
     }

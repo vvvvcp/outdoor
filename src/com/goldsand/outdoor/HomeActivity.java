@@ -1,5 +1,7 @@
 package com.goldsand.outdoor;
 
+import com.goldsand.outservice.outdoorService;
+
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +16,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AccelerateInterpolator;
@@ -23,36 +27,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class HomeActivity extends Activity implements OnClickListener{
-    
-    
     private static final int EXIT_TIME = 2000;
     private final float MAX_ROATE_DEGREE = 1.0f;
-    
     private SensorManager mSensorManager;
     private Sensor mOrientationSensor;
-    
     private float mDirection;
     private float mTargetDirection;
     private AccelerateInterpolator mInterpolator;
     protected final Handler mHandler = new Handler();
-    
    // private boolean mStopDrawing;
 
 //    private TextView latitude;
  //   private TextView longitude;
 
     private LocationApplication outdoor;
-    
     private View backgroundView;
     private HomeView homeView;
-    
     private TextView locationTextView;
     private TextView base_stationTextView;
     private long firstExitTime = 0L;
-    
     private LinearLayout mAngleLayout;
-    
     private boolean mStopDrawing = true;
+    private static final int MENU_START =1;
+    private static final int MENU_STOP  =2;
     protected Runnable mCompassViewUpdater = new Runnable() {
         @Override
         public void run() {
@@ -85,16 +82,14 @@ public class HomeActivity extends Activity implements OnClickListener{
         public void onSensorChanged(SensorEvent event) {
             float direction = event.values[mSensorManager.DATA_X] * -1.0f;
             mTargetDirection = normalizeDegree(direction);
-           
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
     };
-    
     @Override
-    protected void onCreate(Bundle savedInstanceState) 
+    protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         openGPS();
@@ -134,7 +129,6 @@ public class HomeActivity extends Activity implements OnClickListener{
     @Override
     public void onClick(View v) {
         // TODO Auto-generated method stub
-        
     }
     private void openGPS() {
         LocationManager   locationManager=(LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
@@ -147,7 +141,6 @@ public class HomeActivity extends Activity implements OnClickListener{
         startActivityForResult(intent,0);
 
     }
-    
     private void initServices(){
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mOrientationSensor = mSensorManager.getSensorList(Sensor.TYPE_ORIENTATION).get(0);
@@ -165,13 +158,8 @@ public class HomeActivity extends Activity implements OnClickListener{
         base_stationTextView = (TextView) findViewById(R.id.textview_base_station);
         mAngleLayout = (LinearLayout) findViewById(R.id.layout_angle);
         outdoor = LocationApplication.getInstance();
-        
     }
-    
     private void updateDirection(){
-      
-        
-        
     }
     private ImageView getNumberImage(int number){
         ImageView image = new ImageView(this);
@@ -215,7 +203,6 @@ public class HomeActivity extends Activity implements OnClickListener{
     private void updateLocation(){
         locationTextView.setText("latitude:"+Double.toString(outdoor.getLatitude())+"  "+"Longitude:"+Double.toString(outdoor.getLongitude()));
         base_stationTextView.setText("Mcc:"+outdoor.getMcc()+"Mnc:"+outdoor.getMnc()+"Lac:"+outdoor.getLac()+"Cid:"+outdoor.getCid());
-            
     }
     @Override
     public void onBackPressed() {
@@ -230,5 +217,33 @@ public class HomeActivity extends Activity implements OnClickListener{
     }
     private float normalizeDegree(float degree) {
         return (degree + 720) % 360;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case MENU_START:
+            startOutdoor();
+            break;
+        case MENU_STOP:
+            stopOutdoor();
+            break;
+        default:
+            break;
+        }
+        return true;
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        menu.add(0, MENU_START, 0, R.string.start_service);
+        menu.add(0, MENU_STOP, 0, R.string.stop_service);
+        return true;
+    }
+    private void startOutdoor() {
+        this.startService(new Intent(this,outdoorService.class));
+    }
+    private void stopOutdoor() {
+        this.stopService(new Intent(this,outdoorService.class));
     }
 }

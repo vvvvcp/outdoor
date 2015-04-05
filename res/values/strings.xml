@@ -3,5 +3,7 @@
 
     <string name="app_name">outdoor</string>
     <string name="hello_world">Hello world!</string>
+    <string name="start_service">Start Outdoor</string>
+    <string name="stop_service">Stop Outdoor</string>
 
 </resources>
