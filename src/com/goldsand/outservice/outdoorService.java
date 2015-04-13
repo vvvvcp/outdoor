@@ -2,13 +2,14 @@ package com.goldsand.outservice;
 
 import java.util.List;
 
-import android.R.string;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
-import android.telecom.TelecomManager;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -27,9 +28,22 @@ public class outdoorService extends Service{
                 //StringBuffer sBuffer = new StringBuffer("Total Size:"+infos.size()+"\n");
                 Log.i(TAG,"Tatol : "+infos.size());
                 for (NeighboringCellInfo infoLoop : infos) {
-                     Log.i(TAG,"LAC : "+infoLoop.getLac());
-                     Log.i(TAG,"CID : "+infoLoop.getCid());
-                     Log.i(TAG,"Rssi : "+infoLoop.getRssi());
+                     //Log.i(TAG,"LAC : "+infoLoop.getLac());
+                     //Log.i(TAG,"CID : "+infoLoop.getCid());
+                     //Log.i(TAG,"Rssi : "+infoLoop.getRssi());
+                    Uri insertUri = Uri.parse("content://com.goldsand.outdoor.cellinfo/cellid");
+                    //Uri queryUri = Uri.parse("")
+                    Cursor cursor = getContentResolver().query(insertUri, null, "lac ="+infoLoop.getLac()+" and "+"sid ="+infoLoop.getCid(), null, null);
+                    if(cursor!=null && cursor.getCount()>0){
+                        Log.i(TAG,"have");
+                        cursor.close();
+                        break;
+                    }
+                    cursor.close();
+                    ContentValues values=new ContentValues();
+                    values.put("lac",infoLoop.getLac());
+                    values.put("sid", infoLoop.getCid());
+                    Uri uri = getContentResolver().insert(insertUri, values);
                 }
             }
             mHandler.postDelayed(mCellRunnable, 60000);
